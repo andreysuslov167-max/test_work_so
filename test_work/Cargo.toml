@@ -1,0 +1,83 @@
+[package]
+name = "test_work"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["full"]
+full = ["android", "ios", "bench"]
+android = ["dep:jni"]
+ios = ["dep:objc"]
+bench = ["dep:test"]
+
+[dependencies]
+# Core dependencies
+chrono = { version = "0.4", features = ["serde"] }
+serde_json = "1.0"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+rand = "0.8"
+libc = "0.2"
+nix = { version = "0.27", features = ["fs", "process", "time", "ioctl"] }
+memmap2 = "0.9"
+tempfile = "3.8"
+fs2 = "0.4"
+num_cpus = "1.16"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Platform-specific
+[target.'cfg(target_os = "android")'.dependencies]
+jni = { version = "0.21", optional = true }
+android_logger = "0.13"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+objc = { version = "0.2", optional = true }
+core-foundation = "0.9"
+core-foundation-sys = "0.8"
+
+[dev-dependencies]
+test = { package = "test", path = "libtest", optional = true }
+
+[profile.bench]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[[test]]
+name = "kernel"
+path = "tests/kernel_tests.rs"
+required-features = []
+
+[[test]]
+name = "filesystem"
+path = "tests/filesystem_tests.rs"
+required-features = []
+
+[[test]]
+name = "network"
+path = "tests/network_tests.rs"
+required-features = []
+
+[[test]]
+name = "power"
+path = "tests/power_tests.rs"
+required-features = []
+
+[[test]]
+name = "security"
+path = "tests/security_tests.rs"
+required-features = []
+
+[[test]]
+name = "ipc"
+path = "tests/ipc_tests.rs"
+required-features = []
+
+[package.metadata.docs.rs]
+all-features = true
